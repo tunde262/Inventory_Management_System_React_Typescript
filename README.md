@@ -1,54 +1,143 @@
-# React + TypeScript + Vite
+# Inventory Management System – React Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, responsive web application for inventory management built with **React**, **TypeScript**, and **TailwindCSS**, seamlessly connected to a custom **Java SQL REST API backend**. This system enables efficient product management through an intuitive interface, role-based access control, and real-time interaction using modern frontend technologies.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Project Description
 
-## Expanding the ESLint configuration
+This project serves as the frontend for a fully functional inventory management system. It empowers users to **authenticate securely**, **manage product records**, and **visualize data** through an elegant UI. The app leverages robust architectural practices, including **TypeScript typing**, **modular components**, and **state-driven UI rendering**.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+---
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
-    },
-  },
-})
+## 🛠️ Tech Stack
+
+| Category              | Technology                     |
+|-----------------------|--------------------------------|
+| Framework             | React                          |
+| Language              | TypeScript                     |
+| Styling               | TailwindCSS, ShadCN UI         |
+| Routing               | TanStack Router                |
+| State Management      | TanStack Query                 |
+| HTTP Client           | Axios                          |
+| Build Tool            | Vite                           |
+| Version Control       | Git                            |
+| Testing (Backend Only)| Jest, React Testing Library    |
+
+---
+
+## ✅ Features
+
+- 🔐 JWT or Session-based Authentication
+- 🔁 Authentication State Management with refresh/expiration handling
+- 🔒 Role-Based Access Control (RBAC)
+- 📦 CRUD Operations on Products
+- 🔍 Product Search, Filtering, Sorting
+- 📤 Image Uploads & Bulk Product Creation
+- 🗑️ Soft Delete & Bulk Deletion Support
+- ⚛️ Fully Typed React Components with Hooks
+- 📱 Responsive UI using TailwindCSS + ShadCN
+- ⏳ Loading and Error States with Feedback
+- 🔁 Optimistic UI Updates
+- 📊 Pagination, Filtering, and Data Display
+- 🔄 Axios-based API Integration
+- 🧪 Backend Test Coverage with Jest
+
+---
+
+## 📓 User Stories & Acceptance Criteria
+
+### 🔑 Authentication & Authorization
+
+**User Login**
+- Email/password login form using ShadCN components
+- Secure JWT (in-memory) or Session-based (cookie) implementation
+- Error handling and protected routes
+
+**Auth State Management**
+- Token/session refresh mechanism
+- Auto-logout on expiration
+- Redirects on invalid session/token
+
+**RBAC**
+- Show/hide UI features based on role
+- Protect routes via TanStack Router
+- Graceful handling of unauthorized access
+
+---
+
+### 📦 Product Management
+
+**View Products**
+- Fetch via TanStack Query
+- Show loaders, errors, and paginated product list
+- Filtering by category, sorting
+
+**Search Products**
+- Real-time search with debounce
+- Filter by name, description
+- Show "No results" message
+
+**Add Product**
+- Validated form (with image upload and bulk creation)
+- Success/error notifications
+- Form reset on success
+
+**Edit Product**
+- Pre-filled form for editing
+- Success/error feedback
+
+**Delete Product**
+- Confirmation modal before delete
+- Soft delete implementation
+- Bulk delete support
+
+---
+
+## Technical Highlights
+
+### React Implementation
+- Component-based architecture
+- Custom hooks for API/data logic
+- Strong TypeScript usage
+
+### Styling & UX
+- Fully responsive using TailwindCSS
+- Accessible, interactive components via ShadCN
+- Consistent design language
+
+### API Integration
+- Axios with global interceptors
+- Full error/loading management
+- Query caching and real-time feedback
+
+---
+
+## Testing (Backend Only)
+
+- Unit and integration tests using Jest
+- Simulated API request tests
+- Mocked services and edge-case handling
+
+---
+
+## Getting Started
+
+# Clone the repo
+
+```bash
+git clone https://github.com/your-username/inventory-frontend.git
+cd inventory-frontend
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+# Install dependencies
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+```bash
+npm install
+```
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+# Run the development server
+
+```bash
+npm run dev
 ```
