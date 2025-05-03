@@ -1,10 +1,12 @@
 import { Fragment, useState } from 'react';
 import { createFileRoute, Link, redirect } from '@tanstack/react-router';
-import { isAuthenticated, signIn } from '../utils/auth';
+import { signIn } from '../utils/auth';
+import { fetchAuthStatus } from '../hooks/useAuth';
 
 export const Route = createFileRoute('/login')({
-  beforeLoad: () => {
-    if(isAuthenticated()) {
+  beforeLoad: async () => {
+    const { isAuthenticated } = await fetchAuthStatus();
+    if(isAuthenticated) {
       throw redirect({
         to: "/products",
       });
@@ -28,6 +30,16 @@ function RouteComponent() {
 
   // Function to handle input change
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, [e.target.name]: e.target.value});
+
+  // Handle form submit
+  const onSubmit = async () => {
+    try {
+      await signIn({ email, password });
+      // Redirected inside signIn() after token is saved
+    } catch (err) {
+      console.error('Registration failed', err);
+    }
+  };
 
   return (
     <Fragment>
@@ -63,7 +75,7 @@ function RouteComponent() {
             </div>
           </div>
 
-          <button onClick={() => signIn()} className="mt-6 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition cursor-pointer">
+          <button onClick={() => onSubmit()} className="mt-6 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition cursor-pointer">
             Log In
           </button>
 

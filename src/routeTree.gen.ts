@@ -11,6 +11,7 @@
 // Import Routes
 
 import { Route as rootRoute } from './routes/__root'
+import { Route as SearchImport } from './routes/search'
 import { Route as RegisterImport } from './routes/register'
 import { Route as LoginImport } from './routes/login'
 import { Route as CreateImport } from './routes/create'
@@ -21,6 +22,12 @@ import { Route as ProductsProductIdIndexImport } from './routes/products/$produc
 import { Route as ProductsProductIdEditImport } from './routes/products/$productId/edit'
 
 // Create/Update Routes
+
+const SearchRoute = SearchImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => rootRoute,
+} as any)
 
 const RegisterRoute = RegisterImport.update({
   id: '/register',
@@ -109,6 +116,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterImport
       parentRoute: typeof rootRoute
     }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchImport
+      parentRoute: typeof rootRoute
+    }
     '/products/': {
       id: '/products/'
       path: '/products'
@@ -141,6 +155,7 @@ export interface FileRoutesByFullPath {
   '/create': typeof CreateRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/search': typeof SearchRoute
   '/products': typeof ProductsIndexRoute
   '/products/$productId/edit': typeof ProductsProductIdEditRoute
   '/products/$productId': typeof ProductsProductIdIndexRoute
@@ -152,6 +167,7 @@ export interface FileRoutesByTo {
   '/create': typeof CreateRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/search': typeof SearchRoute
   '/products': typeof ProductsIndexRoute
   '/products/$productId/edit': typeof ProductsProductIdEditRoute
   '/products/$productId': typeof ProductsProductIdIndexRoute
@@ -164,6 +180,7 @@ export interface FileRoutesById {
   '/create': typeof CreateRoute
   '/login': typeof LoginRoute
   '/register': typeof RegisterRoute
+  '/search': typeof SearchRoute
   '/products/': typeof ProductsIndexRoute
   '/products/$productId/edit': typeof ProductsProductIdEditRoute
   '/products/$productId/': typeof ProductsProductIdIndexRoute
@@ -177,6 +194,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/login'
     | '/register'
+    | '/search'
     | '/products'
     | '/products/$productId/edit'
     | '/products/$productId'
@@ -187,6 +205,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/login'
     | '/register'
+    | '/search'
     | '/products'
     | '/products/$productId/edit'
     | '/products/$productId'
@@ -197,6 +216,7 @@ export interface FileRouteTypes {
     | '/create'
     | '/login'
     | '/register'
+    | '/search'
     | '/products/'
     | '/products/$productId/edit'
     | '/products/$productId/'
@@ -209,6 +229,7 @@ export interface RootRouteChildren {
   CreateRoute: typeof CreateRoute
   LoginRoute: typeof LoginRoute
   RegisterRoute: typeof RegisterRoute
+  SearchRoute: typeof SearchRoute
   ProductsIndexRoute: typeof ProductsIndexRoute
   ProductsProductIdEditRoute: typeof ProductsProductIdEditRoute
   ProductsProductIdIndexRoute: typeof ProductsProductIdIndexRoute
@@ -220,6 +241,7 @@ const rootRouteChildren: RootRouteChildren = {
   CreateRoute: CreateRoute,
   LoginRoute: LoginRoute,
   RegisterRoute: RegisterRoute,
+  SearchRoute: SearchRoute,
   ProductsIndexRoute: ProductsIndexRoute,
   ProductsProductIdEditRoute: ProductsProductIdEditRoute,
   ProductsProductIdIndexRoute: ProductsProductIdIndexRoute,
@@ -240,6 +262,7 @@ export const routeTree = rootRoute
         "/create",
         "/login",
         "/register",
+        "/search",
         "/products/",
         "/products/$productId/edit",
         "/products/$productId/"
@@ -259,6 +282,9 @@ export const routeTree = rootRoute
     },
     "/register": {
       "filePath": "register.tsx"
+    },
+    "/search": {
+      "filePath": "search.tsx"
     },
     "/products/": {
       "filePath": "products/index.tsx"

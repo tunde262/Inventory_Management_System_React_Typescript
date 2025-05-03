@@ -1,10 +1,12 @@
 import { Fragment, useState } from 'react';
 import { createFileRoute, Link, redirect } from '@tanstack/react-router';
-import { isAuthenticated, signIn } from '../utils/auth';
+import { register } from '../utils/auth';
+import { fetchAuthStatus } from '../hooks/useAuth';
 
 export const Route = createFileRoute('/register')({
-  beforeLoad: () => {
-    if(isAuthenticated()) {
+  beforeLoad: async () => {
+    const { isAuthenticated } = await fetchAuthStatus();
+    if(isAuthenticated) {
       throw redirect({
         to: "/products",
       });
@@ -15,6 +17,7 @@ export const Route = createFileRoute('/register')({
 
 // Initial State
 const initialState = {
+  userName: '',
   email: '',
   password: ''
 }
@@ -25,10 +28,20 @@ function RouteComponent() {
   const [formData, setFormData] = useState(initialState);
 
   // Destructure the email value from form data
-  const { email, password } = formData;
+  const { userName, email, password } = formData;
 
   // Function to handle input change
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => setFormData({ ...formData, [e.target.name]: e.target.value});
+
+  // Handle form submit
+  const onSubmit = async () => {
+    try {
+      await register({ userName, email, password });
+      // Redirected inside register() after token is saved
+    } catch (err) {
+      console.error('Registration failed', err);
+    }
+  };
 
   return (
     <Fragment>
@@ -41,6 +54,17 @@ function RouteComponent() {
           </div>
 
           <div className="space-y-4">
+            <div>
+              <input
+                type="text"
+                name="userName"
+                value={userName}
+                onChange={onChange}
+                placeholder="Your Name"
+                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
+
             <div>
               <input
                 type="text"
@@ -64,7 +88,7 @@ function RouteComponent() {
             </div>
           </div>
 
-          <button onClick={() => signIn()} className="mt-6 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition cursor-pointer">
+          <button onClick={() => onSubmit()} className="mt-6 w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700 transition cursor-pointer">
             Create account
           </button>
 

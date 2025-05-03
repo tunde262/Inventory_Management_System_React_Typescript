@@ -1,4 +1,6 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
+import { useFindById } from '../../../hooks/useFindById';
+import { deleteProduct } from '../../../utils/productActions';
 
 export const Route = createFileRoute('/products/$productId/')({
   component: RouteComponent,
@@ -14,12 +16,12 @@ function RouteComponent() {
   // Get props
   const { productId } = Route.useLoaderData();
 
-  // Fake Data
-  const product = {
-    id: productId,
-    title: 'Modern Wooden Chair',
-    image: 'https://iso.500px.com/wp-content/uploads/2015/03/business_cover.jpeg',
-  };
+  const { data, isLoading, isError } = useFindById(productId);
+
+  if (isLoading) return <p className="text-center">Loading product...</p>;
+  if (isError) return <p className="text-center text-red-500">Failed to load product.</p>;
+
+  const product = data?.product || null;
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8">
@@ -39,10 +41,13 @@ function RouteComponent() {
 
           {/* Actions */}
           <div className="flex gap-4">
-            <button onClick={() => window.location.href = `/products/${product.id}/edit`} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition cursor-pointer">
+            <button onClick={() => window.location.href = `/products/${product.productId}/edit`} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition cursor-pointer">
               Edit
             </button>
-            <button className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition cursor-pointer">
+            <button onClick={async () => {
+              alert("This product will be deleted.");
+              await deleteProduct({product_id: parseInt(productId)})
+            }} className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition cursor-pointer">
               Delete
             </button>
           </div>
