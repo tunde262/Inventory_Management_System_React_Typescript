@@ -1,8 +1,16 @@
 import { useEffect, useState } from 'react';
-import { createFileRoute } from '@tanstack/react-router';
-import { useFindById } from '../../../hooks/useFindById';
-import { editProduct } from '../../../utils/productActions';
+import { createFileRoute, redirect } from '@tanstack/react-router';
 import { useQueryClient } from '@tanstack/react-query';
+
+// Hooks
+import { useFindById } from '../../../hooks/useFindById';
+import { fetchAuthStatus, useAuth } from '../../../hooks/useAuth';
+
+// Backend Actions
+import { editProduct } from '../../../utils/productActions';
+
+// Components
+import { toast } from 'sonner';
 
 // Initial State
 const initialState = {
@@ -15,6 +23,24 @@ const initialState = {
 }
 
 export const Route = createFileRoute('/products/$productId/edit')({
+  beforeLoad: async ({ params }) => {
+    // Get auth status
+    const { isAuthenticated, user } = await fetchAuthStatus();
+
+    // Check auth status
+    if(!isAuthenticated) {
+      throw redirect({
+        to: "/login",
+      });
+    }
+
+    // Check user role permissions
+    if (user.role !== 'admin') {
+      throw redirect({
+        to: "/products/" + params.productId,
+      });
+    }
+  },
   component: RouteComponent,
   loader: async ({ params }) => {
     return {
@@ -33,20 +59,24 @@ function RouteComponent() {
   
     const { data, isLoading, isError } = useFindById(productId);
 
+    // Cache data
     const queryClient = useQueryClient();
+
+    // User Data 
+    const { data: userData } = useAuth();
 
     useEffect(() => {
 
-      // Load user data
+      // Load product data
       if (!isLoading && data && data?.product) {
 
           // Create a copy of the initial form data with user values
-          const userData = { ...initialState };
+          const productData = { ...initialState };
           for (const key in data.product) {
-              if (key in userData) userData[key] = data.product[key];
+              if (key in productData) productData[key] = data.product[key];
           }
 
-          setFormData(userData);
+          setFormData(productData);
       }
 
   }, [data?.product]);
@@ -68,7 +98,44 @@ function RouteComponent() {
     const onSubmit = async (e:any) => {
       e.preventDefault();
   
-      console.log("product data: ", data?.product);
+      console.log("form data: ", formData);
+
+      // Check if user is an admin
+      if (userData?.user?.role !== 'admin') {
+        toast.error("Must be an admin to create stuff.");
+        return;
+      }
+
+      // -- Form validation for required input fields --
+      const requiredFields = [
+        { name: "title", value: title, label: "Product Title" },
+        { name: "description", value: description, label: "Description" },
+        { name: "category", value: category, label: "Category" },
+        { name: "price", value: price, label: "Price" },
+        { name: "quantity", value: quantity, label: "Quantity" },
+      ];
+    
+      for (let field of requiredFields) {
+        if (
+          field.value === '' || 
+          (typeof field.value === 'number' && field.value <= 0)
+        ) {
+          toast.error(`${field.label} is required.`);
+          return;
+        }
+      }
+
+      if (quantity < 1) {
+        toast.error(`Quantity must be greater than 0.`);
+          return;
+      }
+
+      if (price < 1) {
+        toast.error(`Price must be greater than 0.`);
+          return;
+      }
+      
+      // -- END: Form validation for required input fields --
       
       try {
         console.log("form input: ", formData);
@@ -76,8 +143,20 @@ function RouteComponent() {
 
         // Invalidate old cahced data for this product
         queryClient.invalidateQueries({ queryKey: ['product', productId] });
-      } catch (err) {
+
+        // Trigger alert
+        toast.success("Product updated successfully!");
+      } catch (err: any) {
         console.error('Edit Product failed', err);
+
+        // Get specific error message from response
+        const errorMessage =
+        err?.response?.data?.error ||
+        err?.message ||
+        "Something went wrong trying to Log In.";
+
+        // Trigger alert
+        toast.error(errorMessage);
       }
     };
   
@@ -185,7 +264,6 @@ function RouteComponent() {
             id="image"
             type="file"
             accept="image/*"
-            value={img}
             name="img"
             onChange={onChange}
             className="mt-2 w-full text-sm text-gray-500 file:py-2 file:px-4 file:border file:border-gray-300 file:rounded-md file:bg-blue-50 file:text-blue-700 file:hover:bg-blue-100 cursor-pointer"

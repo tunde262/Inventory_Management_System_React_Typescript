@@ -2,6 +2,7 @@ import { Fragment, useState } from 'react';
 import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { signIn } from '../utils/auth';
 import { fetchAuthStatus } from '../hooks/useAuth';
+import { toast } from 'sonner';
 
 export const Route = createFileRoute('/login')({
   beforeLoad: async () => {
@@ -33,11 +34,48 @@ function RouteComponent() {
 
   // Handle form submit
   const onSubmit = async () => {
+
+    console.log("About to attempt Log In");
+
+    // -- Form validation for required input fields --
+    const requiredFields = [
+      { name: "email", value: email, label: "Email" },
+      { name: "password", value: password, label: "Password" },
+    ];
+  
+    for (let field of requiredFields) {
+      if (field.value === '') {
+        toast.error(`${field.label} is required.`);
+        return;
+      }
+    }
+
+    // Email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      toast.error("Invalid email format.");
+      return;
+    }
+
+    // -- END: Form validation for required input fields --
+
     try {
       await signIn({ email, password });
       // Redirected inside signIn() after token is saved
-    } catch (err) {
+
+      // Trigger alert
+      toast.success("Redirecting...");
+    } catch (err: any) {
       console.error('Registration failed', err);
+
+      // Get specific error message from response
+      const errorMessage =
+      err?.response?.data?.error ||
+      err?.message ||
+      "Something went wrong trying to Log In.";
+
+      // Trigger alert
+      toast.error(errorMessage);
     }
   };
 

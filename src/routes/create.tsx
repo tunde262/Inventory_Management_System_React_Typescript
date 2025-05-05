@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import { createFileRoute, redirect } from '@tanstack/react-router';
+import { useQueryClient } from '@tanstack/react-query';
 import { fetchAuthStatus, useAuth } from '../hooks/useAuth';
 import { createProduct } from '../utils/productActions';
+import { toast } from 'sonner';
 
 // Initial State
 const initialState = {
@@ -9,18 +11,27 @@ const initialState = {
   description: '',
   category: '',
   price: 0,
-  quantity: 0,
-  img: ''
+  quantity: 0
 }
 
 export const Route = createFileRoute('/create')({
   beforeLoad: async () => {
-    const { isAuthenticated } = await fetchAuthStatus();
-      if(!isAuthenticated) {
-        throw redirect({
-          to: "/",
-        });
-      }
+    // Get auth status
+    const { isAuthenticated, user } = await fetchAuthStatus();
+
+    // Check auth status
+    if(!isAuthenticated) {
+      throw redirect({
+        to: "/login",
+      });
+    }
+
+    // Check user role permissions
+    if (user.role !== 'admin') {
+      throw redirect({
+        to: "/products",
+      });
+    }
   },
   component: RouteComponent,
 })
@@ -30,7 +41,11 @@ function RouteComponent() {
   // State for form data
   const [formData, setFormData] = useState(initialState);
 
+  // User Data
   const { data, isLoading } = useAuth();
+
+  // Cache data
+  const queryClient = useQueryClient();
   
   // Destructure the email value from form data
   const { 
@@ -39,7 +54,6 @@ function RouteComponent() {
     category,
     price,
     quantity,
-    img
   } = formData;
   
 // Function to handle input change
@@ -52,6 +66,43 @@ function RouteComponent() {
     console.log("user data: ", data?.user);
 
     const user_id = data?.user?.userId;
+
+    // Check if user is an admin
+    if (data?.user?.role !== 'admin') {
+      toast.error("Must be an admin to create stuff.");
+      return;
+    }
+
+    // -- Form validation for required input fields --
+    const requiredFields = [
+      { name: "title", value: title, label: "Product Title" },
+      { name: "description", value: description, label: "Description" },
+      { name: "category", value: category, label: "Category" },
+      { name: "price", value: price, label: "Price" },
+      { name: "quantity", value: quantity, label: "Quantity" },
+    ];
+  
+    for (let field of requiredFields) {
+      if (
+        field.value === '' || 
+        (typeof field.value === 'number' && field.value <= 0)
+      ) {
+        toast.error(`${field.label} is required.`);
+        return;
+      }
+    }
+
+    if (quantity < 1) {
+      toast.error(`Quantity must be greater than 0.`);
+        return;
+    }
+
+    if (price < 1) {
+      toast.error(`Price must be greater than 0.`);
+        return;
+    }
+    
+    // -- END: Form validation for required input fields --
     
     try {
       if (!user_id) {
@@ -59,8 +110,27 @@ function RouteComponent() {
       }
       console.log("form input: ", formData);
       await createProduct({ ...formData, user_id });
-    } catch (err) {
-      console.error('Add Product failed', err);
+
+      // Clear form on success
+      setFormData(initialState);
+
+      // Trigger alert
+      toast.success("Product updated successfully!");
+
+      // Invalidate old cahced product list data
+      queryClient.invalidateQueries({ queryKey: ['products'] });
+
+    } catch (err: any) {
+      console.error('Create Product failed', err);
+
+      // Get specific error message from response
+      const errorMessage =
+      err?.response?.data?.error ||
+      err?.message ||
+      "Something went wrong trying to Log In.";
+
+      // Trigger alert
+      toast.error(errorMessage);
     }
   };
 
@@ -147,7 +217,7 @@ function RouteComponent() {
           <input
             id="quantity"
             type="number"
-            min="1"
+            min="0"
             name="quantity"
             value={quantity}
             onChange={onChange}
@@ -165,7 +235,6 @@ function RouteComponent() {
             id="image"
             type="file"
             accept="image/*"
-            value={img}
             name="img"
             onChange={onChange}
             className="mt-2 w-full text-sm text-gray-500 file:py-2 file:px-4 file:border file:border-gray-300 file:rounded-md file:bg-blue-50 file:text-blue-700 file:hover:bg-blue-100 cursor-pointer"

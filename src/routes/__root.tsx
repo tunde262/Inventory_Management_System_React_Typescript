@@ -2,7 +2,8 @@ import { Fragment, useEffect, useState } from 'react';
 import { createRootRoute, Link, Outlet } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { signOut } from '../utils/auth';
-import { fetchAuthStatus } from '../hooks/useAuth';
+import { fetchAuthStatus, useAuth } from '../hooks/useAuth';
+import { Toaster } from 'sonner';
 
 type AuthState = {
     isAuthenticated: boolean;
@@ -16,6 +17,9 @@ export const Route = createRootRoute({
 function RootComponent() {
 
     const [auth, setAuth] = useState<AuthState>({ isAuthenticated: false, user: null });
+
+    // User Data
+    const { data, isLoading } = useAuth();
 
     useEffect(() => {
         const loadAuth = async () => {
@@ -48,14 +52,18 @@ function RootComponent() {
                     <Link to="/products" className="[&.active]:font-bold">
                         Products
                     </Link>
-                    <Link to="/create" className="[&.active]:font-bold">
-                        Create
-                    </Link>
+                    {data?.user?.role === 'admin' && (
+                        <Link to="/create" className="[&.active]:font-bold">
+                            Create
+                        </Link>
+                    )}
                 </Fragment>
             )}
         </div>
         <hr />
         <Outlet />
+        {/* Show Alert Popup */}
+        <Toaster />
         <TanStackRouterDevtools />
         </>
     )
