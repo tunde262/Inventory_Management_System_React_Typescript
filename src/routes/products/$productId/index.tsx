@@ -80,12 +80,24 @@ function RouteComponent() {
           {/* Title */}
           <h2 className="text-2xl font-semibold">{product.title}</h2>
 
+          {/* Product Details */}
+          <div className="text-gray-700 space-y-2">
+            <p><strong>Description:</strong> {product.description}</p>
+            <p><strong>Category:</strong> {product.category}</p>
+            <p><strong>Quantity:</strong> {product.quantity}</p>
+            <p><strong>Price:</strong> ${product.price}</p>
+          </div>
+
           {/* Actions */}
           {userData?.user?.role === 'admin' && (
-            <div className="flex gap-4">
-              <button onClick={() => window.location.href = `/products/${product.productId}/edit`} className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition cursor-pointer">
+            <div className="flex gap-4 mt-4">
+              <button
+                onClick={() => window.location.href = `/products/${product.productId}/edit`}
+                className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition cursor-pointer"
+              >
                 Edit
               </button>
+
               {/* Delete Button Triggers Dialog */}
               <Dialog open={open} onOpenChange={setOpen}>
                 <DialogTrigger asChild>

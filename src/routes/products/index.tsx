@@ -1,8 +1,13 @@
-import { Fragment, useState, useEffect } from 'react';
+import { Fragment, useState, useEffect, useRef } from 'react';
 import { createFileRoute, Link, redirect } from '@tanstack/react-router';
 import { fetchAuthStatus, useAuth } from '../../hooks/useAuth';
 import { useProducts } from '../../hooks/useProducts';
 import { toast } from 'sonner';
+import { Button } from "@/components/ui/button";
+import Papa from 'papaparse';
+
+// Backend Actions
+import { createProduct } from '../../utils/productActions';
 
 // Backend Actions
 import { deleteProduct } from '../../utils/productActions';
@@ -17,7 +22,7 @@ import {
   PaginationNext,
 } from "@/components/ui/pagination";
 
-const categories = ['All', 'Electronics', 'Home'];
+const categories = ['All', 'Sedan', 'Coupe', 'SUV', 'Truck', 'Minivan'];
 
 export const Route = createFileRoute('/products/')({
   beforeLoad: async () => {
@@ -34,6 +39,8 @@ export const Route = createFileRoute('/products/')({
 function Products() {
 
   // const { data, isLoading, isError } = useAuth();
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Filter Data 
   const [selectedCategory, setSelectedCategory] = useState('All');
@@ -52,6 +59,12 @@ function Products() {
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [selectAll, setSelectAll] = useState(false);  
   const [loading, setLoading] = useState(false);  
+
+  // Buld Add Logic
+  const [uploading, setUploading] = useState(false);
+
+  // User Data
+  const { data: userData, isLoading: userLoading } = useAuth();
 
 
   // Product Data
@@ -146,57 +159,85 @@ function Products() {
   };
 
   // -- Bulk Delete Logic
+
+  // -- Bulk Add Logic
+
+  const handleClick = () => {
+    fileInputRef.current?.click();
+  };
+
+  const handleCsvUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+
+    console.log("user data: ", userData?.user);
+
+    const user_id = userData?.user?.userId;
+
+    // Check if user is an admin
+    if (userData?.user?.role !== 'admin') {
+      toast.error("Must be an admin to create stuff.");
+      return;
+    }
+
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    setUploading(true);
+  
+    Papa.parse(file, {
+      header: true,
+      skipEmptyLines: true,
+      complete: async (results) => {
+        const parsedItems = results.data as any[];
+        try {
+
+          let successCount = 0;
+
+          for (const item of parsedItems) {
+            // Optionally validate/convert fields
+            const productData = {
+              title: item.title,
+              description: item.description,
+              category: item.category,
+              price: parseFloat(item.price),
+              quantity: parseInt(item.quantity),
+              img: item.img,
+              user_id: user_id,
+            };
+
+            await createProduct(productData);
+            successCount++;
+          }
+  
+          toast.success(`Uploaded ${successCount} products from CSV`);
+        } catch (err: any) {
+          console.error('Bulk Create Products failed', err);
+
+          // Get specific error message from response
+          const errorMessage =
+          err?.response?.data?.error ||
+          err?.message ||
+          "Failed to process CSV file.";
+
+          // Trigger alert
+          toast.error(errorMessage);
+        } finally {
+          setUploading(false);
+        }
+      },
+      error: (error) => {
+        toast.error("CSV parsing failed.");
+        setUploading(false);
+      }
+    });
+  };  
+
+  // -- END: Bulk Add Logic
     
   return (
     <Fragment>
       <div className="min-h-screen bg-gray-50 py-10 px-4">
         <div className="max-w-4xl mx-auto">
           <h1 className="text-3xl font-bold text-gray-800 mb-6">Product Inventory</h1>
-
-          {/* Filter Dropdown */}
-          <div className="mb-6">
-            <label className="block mb-2 text-sm font-medium text-gray-700">Filter by Category</label>
-            <select
-              className="border border-gray-300 rounded px-3 py-2 w-full md:w-1/2"
-              value={selectedCategory}
-              onChange={e => setSelectedCategory(e.target.value)}
-            >
-              {categories.map(category => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </select>
-          </div>
-
-          {/* Sort Dropdown */}
-          <div className="mb-6">
-            <label className="block mb-2 text-sm font-medium text-gray-700">Sort by</label>
-            <select
-              className="border border-gray-300 rounded px-3 py-2 w-full md:w-1/2"
-              value={sortOption}
-              onChange={e => setSortOption(e.target.value)}
-            >
-              <option value="">None</option>
-              <option value="price-asc">Price: Low to High</option>
-              <option value="price-desc">Price: High to Low</option>
-              <option value="title-asc">Title: A to Z</option>
-              <option value="title-desc">Title: Z to A</option>
-            </select>
-          </div>
-
-          {/* Price Filter Dropdown */}
-          <div className="mb-6">
-            <label className="block mb-2 text-sm font-medium text-gray-700">Filter by Price</label>
-            <select
-              className="border border-gray-300 rounded px-3 py-2 w-full md:w-1/2"
-              value={priceFilter}
-              onChange={e => setPriceFilter(e.target.value)}
-            >
-              <option value="All">All</option>
-              <option value="under-50">Under $50</option>
-              <option value="under-100">Under $100</option>
-              <option value="under-200">Under $200</option>
-            </select>
-          </div>
 
           {/* Search Input */}
           <div className="mb-6">
@@ -214,13 +255,79 @@ function Products() {
               }}
               className="border border-gray-300 rounded px-3 py-2 w-full md:w-1/2"
             />
-            
+          </div>
+
+          {/* Filters Row */}
+          <div className="mb-6 flex flex-wrap gap-4">
+            {/* Filter by Category */}
+            <div className="flex-1 min-w-[200px]">
+              <label className="block mb-1 text-sm font-medium text-gray-700">Category</label>
+              <select
+                className="border border-gray-300 rounded px-3 py-2 w-full"
+                value={selectedCategory}
+                onChange={e => setSelectedCategory(e.target.value)}
+              >
+                {categories.map(category => (
+                  <option key={category} value={category}>{category}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Sort by */}
+            <div className="flex-1 min-w-[200px]">
+              <label className="block mb-1 text-sm font-medium text-gray-700">Sort</label>
+              <select
+                className="border border-gray-300 rounded px-3 py-2 w-full"
+                value={sortOption}
+                onChange={e => setSortOption(e.target.value)}
+              >
+                <option value="">None</option>
+                <option value="price-asc">Price: Low to High</option>
+                <option value="price-desc">Price: High to Low</option>
+                <option value="title-asc">Title: A to Z</option>
+                <option value="title-desc">Title: Z to A</option>
+              </select>
+            </div>
+
+            {/* Filter by Price */}
+            <div className="flex-1 min-w-[200px]">
+              <label className="block mb-1 text-sm font-medium text-gray-700">Price</label>
+              <select
+                className="border border-gray-300 rounded px-3 py-2 w-full"
+                value={priceFilter}
+                onChange={e => setPriceFilter(e.target.value)}
+              >
+                <option value="All">All</option>
+                <option value="under-50">Under $50</option>
+                <option value="under-100">Under $100</option>
+                <option value="under-200">Under $200</option>
+              </select>
+            </div>
           </div>
 
 
           {/* Product Table */}
           <div className="bg-white shadow rounded-lg divide-y divide-gray-200">
             <div className="flex items-center justify-between mb-4">
+            <input
+              type="file"
+              accept=".csv"
+              ref={fileInputRef}
+              style={{ display: 'none' }}
+              onChange={handleCsvUpload}
+            />
+            <Button
+              variant="outline"
+              className="ml-2"
+              disabled={uploading}
+              onClick={handleClick}
+            >
+              {uploading && (
+                <span>Loading...</span>
+              )}
+              {uploading ? "Uploading..." : "Upload CSV"}
+            </Button>
+
               <div>
                 <input
                   type="checkbox"
