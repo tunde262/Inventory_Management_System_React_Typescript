@@ -11,7 +11,8 @@ const initialState = {
   description: '',
   category: '',
   price: 0,
-  quantity: 0
+  quantity: 0,
+  img: ''
 }
 
 export const Route = createFileRoute('/create')({
@@ -57,7 +58,24 @@ function RouteComponent() {
   } = formData;
   
 // Function to handle input change
-  const onChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLSelectElement | HTMLInputElement>) => setFormData({ ...formData, [e.target.name]: e.target.value});
+  const onChange = (e: React.ChangeEvent<HTMLTextAreaElement | HTMLSelectElement | HTMLInputElement>) => {
+    const { name, value, type } = e.target;
+  
+    if (type === 'file') {
+      const file = (e.target as HTMLInputElement).files?.[0];
+  
+      if (file) {
+        const reader = new FileReader();
+        reader.onloadend = () => {
+          // Save base64 string as img
+          setFormData(prev => ({ ...prev, img: reader.result as string }));
+        };
+        reader.readAsDataURL(file);
+      }
+    } else {
+      setFormData({ ...formData, [name]: value });
+    }
+  };
   
   // Handle form submit
   const onSubmit = async (e:any) => {
@@ -228,18 +246,23 @@ function RouteComponent() {
 
         {/* Product Image */}
         <div className="mb-6">
-          <label htmlFor="image" className="block text-sm font-medium text-gray-700">
+          <label htmlFor="img" className="block text-sm font-medium text-gray-700">
             Product Image
           </label>
           <input
-            id="image"
+            id="img"
             type="file"
-            accept="image/*"
+            accept=".jpeg, .jpg, .png, .webp"
             name="img"
             onChange={onChange}
             className="mt-2 w-full text-sm text-gray-500 file:py-2 file:px-4 file:border file:border-gray-300 file:rounded-md file:bg-blue-50 file:text-blue-700 file:hover:bg-blue-100 cursor-pointer"
           />
         </div>
+
+        {formData.img && (
+          <img src={formData.img} alt="Preview" className="w-full max-h-64 object-contain mt-4 rounded-md" />
+        )}
+
 
         {/* Submit Button */}
         <button

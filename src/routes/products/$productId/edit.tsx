@@ -165,7 +165,7 @@ function RouteComponent() {
 
   return (
     <div className="max-w-xl mx-auto px-4 py-8">
-      <h1 className="text-3xl font-semibold text-center mb-6">Edit Product</h1>
+      <h1 className="text-3xl font-semibold text-center mb-6">Edit Product Info</h1>
 
       <form onSubmit={onSubmit} className="bg-white p-6 shadow-md rounded-lg">
         {/* Product Title */}
@@ -256,7 +256,7 @@ function RouteComponent() {
         </div>
 
         {/* Product Image */}
-        <div className="mb-6">
+        {/* <div className="mb-6">
           <label htmlFor="image" className="block text-sm font-medium text-gray-700">
             Product Image
           </label>
@@ -268,7 +268,7 @@ function RouteComponent() {
             onChange={onChange}
             className="mt-2 w-full text-sm text-gray-500 file:py-2 file:px-4 file:border file:border-gray-300 file:rounded-md file:bg-blue-50 file:text-blue-700 file:hover:bg-blue-100 cursor-pointer"
           />
-        </div>
+        </div> */}
 
         {/* Submit Button */}
         <button

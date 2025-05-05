@@ -7,6 +7,7 @@ export async function createProduct({
     price,
     quantity,
     user_id,
+    img
   }: { 
     title: string; 
     description: string; 
@@ -14,6 +15,7 @@ export async function createProduct({
     price: number; 
     quantity: number;
     user_id?: number; // if needed
+    img: string;
 }) {
     console.log("ABOUT TO CREATE PRODUCT")
   try {
@@ -30,7 +32,8 @@ export async function createProduct({
         category,
         price,
         quantity, 
-        user_id
+        user_id,
+        img
     },
     {
       headers: {

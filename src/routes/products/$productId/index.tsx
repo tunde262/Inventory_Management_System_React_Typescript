@@ -70,7 +70,7 @@ function RouteComponent() {
       <div className="bg-white shadow-md rounded-xl overflow-hidden border">
         {/* Image */}
         <img
-          src={product.image}
+          src={product.img}
           alt={product.title}
           className="w-full h-64 object-cover"
         />
