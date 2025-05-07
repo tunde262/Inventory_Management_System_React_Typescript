@@ -1,6 +1,6 @@
 # Inventory Management System – React Frontend
 
-A modern, responsive web application for inventory management built with **React**, **TypeScript**, and **TailwindCSS**, seamlessly connected to a custom **Java SQL REST API backend**. This system enables efficient product management through an intuitive interface, role-based access control, and real-time interaction using modern frontend technologies.
+A simple, responsive web app for inventory management built with **React**, **TypeScript**, and **TailwindCSS**. This system enables efficient product management through a simple interface, role-based access control, and is built using modern frontend technologies.
 
 ![thumbnail](https://github.com/tunde262/Inventory_Management_System_React_Typescript/blob/main/assets/thumbnail.png?raw=true)
 
@@ -8,7 +8,7 @@ A modern, responsive web application for inventory management built with **React
 
 ## Project Description
 
-This project serves as the frontend for a fully functional inventory management system. It empowers users to **authenticate securely**, **manage product records**, and **visualize data** through an elegant UI. The app leverages robust architectural practices, including **TypeScript typing**, **modular components**, and **state-driven UI rendering**.
+This project serves as the frontend for a basic inventory management system. It allows e-commerce / brick-and-mortar owners to **manage products** and **sign in / register securely** through a very simple UI. The app leverages a Java-Spring Backend API that depends on a PostgrSQL database. The code architectural practices, include **TypeScript typing**, **modular components**, and **state-driven UI rendering**.
 
 ---
 
@@ -24,7 +24,7 @@ This project serves as the frontend for a fully functional inventory management 
 | HTTP Client           | Axios                          |
 | Build Tool            | Vite                           |
 | Version Control       | Git                            |
-| Testing (Backend Only)| Jest, React Testing Library    |
+| Testing (Backend Only)| JUnit, Mockito                 |
 
 ---
 
@@ -57,11 +57,10 @@ This project serves as the frontend for a fully functional inventory management 
 - Error handling and protected routes
 
 **Auth State Management**
-- Token/session refresh mechanism
-- Auto-logout on expiration
-- Redirects on invalid session/token
+- JWT Tokens
+- Redirects on invalid token
 
-**RBAC**
+**Role-Based Access Control**
 - Show/hide UI features based on role
 - Protect routes via TanStack Router
 - Graceful handling of unauthorized access
@@ -91,7 +90,6 @@ This project serves as the frontend for a fully functional inventory management 
 
 **Delete Product**
 - Confirmation modal before delete
-- Soft delete implementation
 - Bulk delete support
 
 ---
@@ -112,14 +110,6 @@ This project serves as the frontend for a fully functional inventory management 
 - Axios with global interceptors
 - Full error/loading management
 - Query caching and real-time feedback
-
----
-
-## Testing (Backend Only)
-
-- Unit and integration tests using Jest
-- Simulated API request tests
-- Mocked services and edge-case handling
 
 ---
 
