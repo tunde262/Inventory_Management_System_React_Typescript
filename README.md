@@ -2,15 +2,17 @@
 
 A modern, responsive web application for inventory management built with **React**, **TypeScript**, and **TailwindCSS**, seamlessly connected to a custom **Java SQL REST API backend**. This system enables efficient product management through an intuitive interface, role-based access control, and real-time interaction using modern frontend technologies.
 
+![thumbnail](https://github.com/tunde262/Inventory_Management_System_React_Typescript/blob/main/assets/thumbnail.png?raw=true)
+
 ---
 
-## 🚀 Project Description
+## Project Description
 
 This project serves as the frontend for a fully functional inventory management system. It empowers users to **authenticate securely**, **manage product records**, and **visualize data** through an elegant UI. The app leverages robust architectural practices, including **TypeScript typing**, **modular components**, and **state-driven UI rendering**.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 | Category              | Technology                     |
 |-----------------------|--------------------------------|
@@ -26,28 +28,28 @@ This project serves as the frontend for a fully functional inventory management 
 
 ---
 
-## ✅ Features
+## Features
 
-- 🔐 JWT or Session-based Authentication
-- 🔁 Authentication State Management with refresh/expiration handling
-- 🔒 Role-Based Access Control (RBAC)
-- 📦 CRUD Operations on Products
-- 🔍 Product Search, Filtering, Sorting
-- 📤 Image Uploads & Bulk Product Creation
-- 🗑️ Soft Delete & Bulk Deletion Support
-- ⚛️ Fully Typed React Components with Hooks
-- 📱 Responsive UI using TailwindCSS + ShadCN
-- ⏳ Loading and Error States with Feedback
-- 🔁 Optimistic UI Updates
-- 📊 Pagination, Filtering, and Data Display
-- 🔄 Axios-based API Integration
-- 🧪 Backend Test Coverage with Jest
+- JWT or Session-based Authentication
+- Authentication State Management with refresh/expiration handling
+- Role-Based Access Control (RBAC)
+- CRUD Operations on Products
+- Product Search, Filtering, Sorting
+- Image Uploads & Bulk Product Creation
+- Soft Delete & Bulk Deletion Support
+- Fully Typed React Components with Hooks
+- Responsive UI using TailwindCSS + ShadCN
+- Loading and Error States with Feedback
+- Optimistic UI Updates
+- Pagination, Filtering, and Data Display
+- Axios-based API Integration
+- Backend Test Coverage with Jest
 
 ---
 
-## 📓 User Stories & Acceptance Criteria
+## User Stories & Acceptance Criteria
 
-### 🔑 Authentication & Authorization
+### Authentication & Authorization
 
 **User Login**
 - Email/password login form using ShadCN components
@@ -66,7 +68,7 @@ This project serves as the frontend for a fully functional inventory management 
 
 ---
 
-### 📦 Product Management
+### Product Management
 
 **View Products**
 - Fetch via TanStack Query
